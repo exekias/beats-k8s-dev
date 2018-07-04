@@ -60,6 +60,10 @@ echo "kibana..."
 $BIN/kubectl create -f manifests/kibana.yaml
 echo ""
 
+echo "filebeat..."
+$BIN/kubectl create -f manifests/filebeat.yaml
+echo ""
+
 echo "Cluster is ready. Once deployments are done Kibana will be available under: http://$(minikube ip):5601"
 echo "To kill current deployments and stop the cluster just run:"
 echo "  $BIN/minikube delete"
