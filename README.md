@@ -22,3 +22,12 @@ Once done, services will start their deploy, you can check the status with the `
 ```console
 $ ./bin/kubectl get po
 ```
+
+## In progress
+
+- [ ] Allow to set Elastic stack version in the script
+- [ ] Add Metricbeat
+- [ ] Add Auditbeat
+- [ ] Add Packetbeat
+- [ ] Enable autodiscover by default
+- [ ] Add active wait for Kibana at the end of the script?

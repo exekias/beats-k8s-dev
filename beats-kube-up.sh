@@ -3,8 +3,6 @@ set -e
 
 K8S_VERSION="v1.10.0"
 MINIKUBE_VERSION="v0.28.0"
-#TODO set beats version here
-#BEATS_VERSION="6.3.0"
 MEMORY_MB="8192"
 BIN=./bin
 
