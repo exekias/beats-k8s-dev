@@ -14,6 +14,13 @@ spec:
       labels:
         app: kibana
     spec:
+      initContainers:
+        - name: wait-elasticsearch
+          image: busybox
+          command:
+            - sh
+            - -c
+            - until nslookup elasticsearch; do echo Waiting for elasticsearch; sleep 1; done
       containers:
       - name: kibana
         image: docker.elastic.co/kibana/kibana:6.3.0

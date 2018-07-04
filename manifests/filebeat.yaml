@@ -37,6 +37,13 @@ spec:
         app: filebeat
     spec:
       serviceAccount: filebeat
+      initContainers:
+        - name: wait-kibana
+          image: busybox
+          command:
+            - sh
+            - -c
+            - until nslookup kibana; do echo Waiting for kibana; sleep 1; done
       containers:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:6.3.0
