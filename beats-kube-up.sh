@@ -62,6 +62,10 @@ echo "filebeat..."
 $BIN/kubectl create -f manifests/filebeat.yaml
 echo ""
 
+echo "metricbeat..."
+$BIN/kubectl create -f manifests/metricbeat.yaml
+echo ""
+
 echo "Cluster is ready. Once deployments are done you can access:"
 echo ""
 echo "  Elasticsearch: http://$(minikube ip):9200"

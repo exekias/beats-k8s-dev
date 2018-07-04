@@ -26,7 +26,6 @@ $ ./bin/kubectl get po
 ## In progress
 
 - [ ] Allow to set Elastic stack version in the script
-- [ ] Add Metricbeat
 - [ ] Add Auditbeat
 - [ ] Add Packetbeat
 - [ ] Enable autodiscover by default

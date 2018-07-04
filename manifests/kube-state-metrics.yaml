@@ -3,18 +3,17 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kube-state-metrics
-  namespace: kube-system
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        k8s-app: kube-state-metrics
+        app: kube-state-metrics
     spec:
       serviceAccountName: kube-state-metrics
       containers:
       - name: kube-state-metrics
-        image: quay.io/coreos/kube-state-metrics:v1.2.0
+        image: quay.io/coreos/kube-state-metrics:v1.3.0
         ports:
         - name: http-metrics
           containerPort: 8080
@@ -32,6 +31,20 @@ spec:
             memory: 50Mi
             cpu: 200m
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics
+  labels:
+    app: kube-state-metrics
+spec:
+  selector:
+    app: kube-state-metrics
+  ports:
+  - name: http-metrics
+    port: 8080
+    targetPort: http-metrics
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -43,7 +56,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kube-state-metrics
-  namespace: kube-system
+  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -89,22 +102,3 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-state-metrics
-  namespace: kube-system
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kube-state-metrics
-  namespace: kube-system
-  labels:
-    k8s-app: kube-state-metrics
-  annotations:
-    prometheus.io/scrape: 'true'
-spec:
-  ports:
-  - name: http-metrics
-    port: 8080
-    targetPort: http-metrics
-    protocol: TCP
-  selector:
-    k8s-app: kube-state-metrics
