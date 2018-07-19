@@ -58,6 +58,12 @@ data:
     processors:
       - add_cloud_metadata:
 
+    metricbeat.autodiscover:
+      providers:
+        - type: kubernetes
+          host: ${HOSTNAME}
+          hints.enabled: true
+
     output.elasticsearch:
       hosts: ['elasticsearch:9200']
 ---
@@ -81,7 +87,7 @@ spec:
           command:
             - sh
             - -c
-            - until nslookup kibana; do echo Waiting for kibana; sleep 1; done
+            - until wget -q localhost:5601; do echo Waiting for kibana; sleep 1; done
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:

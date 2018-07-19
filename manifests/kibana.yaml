@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: kibana
+      annotations:
+        co.elastic.metrics.kibana/module: kibana
+        co.elastic.metrics.kibana/hosts: "${data.host}:5601"
     spec:
       initContainers:
         - name: wait-elasticsearch

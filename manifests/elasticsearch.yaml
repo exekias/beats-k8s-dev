@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         app: elasticsearch
+      annotations:
+        co.elastic.metrics.elasticsearch/module: elasticsearch
+        co.elastic.metrics.elasticsearch/hosts: "${data.host}:9200"
     spec:
       terminationGracePeriodSeconds: 300
       initContainers:
