@@ -30,3 +30,20 @@ $ ./bin/kubectl get po
 - [ ] Add Packetbeat
 - [ ] Enable autodiscover by default
 - [ ] Add active wait for Kibana at the end of the script?
+
+## GCP
+
+These manifests can also be run on GCP. It requires your user to be admin. For this run:
+
+```
+kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=your@mail.co
+```
+
+To forward a specific port (for example Kibana) to your host run the following commands:
+
+```
+kubectl get pod
+kubectl port-forward kibana-85bcc47749-stsc4 5601:5601
+```
+
+Replace `kibana-85bcc47749-stsc4` with the pod name you see in the `get pod` result.
