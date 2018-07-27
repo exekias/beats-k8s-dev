@@ -42,7 +42,8 @@ if [ ! -f $BIN/kubectl ]; then
   echo ""
 fi
 
-$BIN/minikube start --kubernetes-version=$K8S_VERSION --memory $MEMORY_MB
+$BIN/minikube start --kubernetes-version=$K8S_VERSION --memory $MEMORY_MB  --extra-config=apiserver.service-node-port-range=1-30000
+
 echo ""
 
 echo "Deploying services..."

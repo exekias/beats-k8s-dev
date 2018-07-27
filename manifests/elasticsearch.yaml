@@ -51,7 +51,6 @@ spec:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
         ports:
         - containerPort: 9200
-          hostPort: 9200
           name: http
         env:
           - name: cluster.name
@@ -77,9 +76,10 @@ metadata:
   labels:
     service: elasticsearch
 spec:
+  type: NodePort
   selector:
     app: elasticsearch
-  clusterIP: None
   ports:
   - port: 9200
+    nodePort: 9200
     name: http

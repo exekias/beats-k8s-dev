@@ -64,6 +64,8 @@ data:
           host: ${HOSTNAME}
           hints.enabled: true
 
+    setup.kibana.host: "kibana:5601"
+
     output.elasticsearch:
       hosts: ['elasticsearch:9200']
 ---
@@ -87,7 +89,7 @@ spec:
           command:
             - sh
             - -c
-            - until wget -q localhost:5601; do echo Waiting for kibana; sleep 1; done
+            - until wget -q kibana:5601; do echo Waiting for kibana; sleep 1; done
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
