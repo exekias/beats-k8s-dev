@@ -1,85 +1,104 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
-  name: elasticsearch
-  labels:
-    app: elasticsearch
+  name: monitored-cluster
 spec:
-  replicas: 1
   selector:
-    matchLabels:
-      app: elasticsearch
-  template:
-    metadata:
-      labels:
-        app: elasticsearch
-      annotations:
-        co.elastic.metrics.elasticsearch/module: elasticsearch
-        co.elastic.metrics.elasticsearch/hosts: "${data.host}:9200"
-    spec:
-      terminationGracePeriodSeconds: 300
-      initContainers:
-      - name: fix-the-volume-permission
-        image: busybox
-        command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /usr/share/elasticsearch/data
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - name: data
-          mountPath: /usr/share/elasticsearch/data
-      - name: increase-the-vm-max-map-count
-        image: busybox
-        command:
-        - sysctl
-        - -w
-        - vm.max_map_count=262144
-        securityContext:
-          privileged: true
-      - name: increase-the-ulimit
-        image: busybox
-        command:
-        - sh
-        - -c
-        - ulimit -n 65536
-        securityContext:
-          privileged: true
-      containers:
-      - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
-        ports:
-        - containerPort: 9200
-          name: http
-        env:
-          - name: cluster.name
-            value: elasticsearch-cluster
-          - name: node.name
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: ES_JAVA_OPTS
-            value: -Xms2g -Xmx2g
-        volumeMounts:
-        - name: data
-          mountPath: /usr/share/elasticsearch/data
-      volumes:
-        - name: data
-          hostPath:
-            path: /var/lib/elasticsearch-data
+    component: 63-elasticsearch
+  ports:
+  - name: http
+    protocol: TCP
+    port: 9200
+    targetPort: 9200
+  - name: transport
+    protocol: TCP
+    port: 9300
+    targetPort: 9300
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: elasticsearch
-  labels:
-    service: elasticsearch
-spec:
-  type: NodePort
+  name: monitored-cluster-headless
+spec: 
+  clusterIP: None  
   selector:
-    app: elasticsearch
-  ports:
-  - port: 9200
-    nodePort: 9200
-    name: http
+    component: 63-elasticsearch
+---
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: 63-elasticsearch
+  labels:
+    component: 63-elasticsearch
+spec:
+  replicas: 3
+  serviceName: monitored-cluster-headless  
+  template:
+    metadata: 
+      name: monitored-cluster
+      labels:
+        component: 63-elasticsearch  
+      annotations:
+        co.elastic.metrics.es-data/module: elasticsearch
+        co.elastic.metrics.es-data/hosts: "${data.host}:9200"    
+    spec:
+      initContainers:
+        - name: increase-the-vm-max-map-count
+          image: busybox
+          command:
+          - sysctl
+          - -w
+          - vm.max_map_count=262144
+          securityContext:
+            privileged: true
+        - name: increase-the-ulimit
+          image: busybox
+          command:
+          - sh
+          - -c
+          - ulimit -n 65536
+          securityContext:
+            privileged: true
+      containers:
+      - name: es-data
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 3
+          timeoutSeconds: 5
+          exec:
+            command: 
+              - sh
+              - -c
+              - "curl http://${HOSTNAME}:9200/_cluster/health"
+        ports:
+        - name: http
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        env:
+          - name: node.name
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: discovery.zen.minimum_master_nodes 
+            value: "2"
+          - name: MICKYEST
+            value: "6"
+          - name: network.host
+            value: "_site_"
+          - name: discovery.zen.ping.unicast.hosts
+            value: "monitored-cluster"
+          - name: cluster.name
+            value: "monitored-cluster"
+          - name: ES_JAVA_OPTS
+            value: -Xmx1g -Xms1g
+          - name: node.data
+            value: "true"
+          - name: node.ingest
+            value: "true"
+        
