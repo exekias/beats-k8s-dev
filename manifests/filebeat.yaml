@@ -43,7 +43,7 @@ spec:
           command:
             - sh
             - -c
-            - until nslookup kibana; do echo Waiting for kibana; sleep 1; done
+            - until wget -q kibana:5601; do echo Waiting for kibana; sleep 1; done
       containers:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:6.3.0

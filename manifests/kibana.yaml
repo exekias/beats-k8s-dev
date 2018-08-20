@@ -23,7 +23,7 @@ spec:
           command:
             - sh
             - -c
-            - until nslookup elasticsearch; do echo Waiting for elasticsearch; sleep 1; done
+            - until wget -q elasticsearch:9200; do echo Waiting for elasticsearch; sleep 1; done
       containers:
       - name: kibana
         image: docker.elastic.co/kibana/kibana:6.3.0
@@ -37,7 +37,6 @@ spec:
             value: http://elasticsearch:9200
         ports:
         - containerPort: 5601
-          hostPort: 5601
           name: ui
 ---
 apiVersion: v1
@@ -47,9 +46,10 @@ metadata:
   labels:
     service: kibana
 spec:
+  type: NodePort
   selector:
     app: kibana
-  clusterIP: None
   ports:
   - port: 5601
+    nodePort: 5601
     name: ui
