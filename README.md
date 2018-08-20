@@ -28,8 +28,6 @@ $ ./bin/kubectl get po
 - [ ] Allow to set Elastic stack version in the script
 - [ ] Add Auditbeat
 - [ ] Add Packetbeat
-- [ ] Enable autodiscover by default
-- [ ] Add active wait for Kibana at the end of the script?
 
 ## GCP
 
