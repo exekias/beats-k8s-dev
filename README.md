@@ -29,7 +29,7 @@ $ ./bin/kubectl get po
 - [ ] Add Auditbeat
 - [ ] Add Packetbeat
 
-## GCP
+## GCP
 
 These manifests can also be run on GCP. It requires your user to be admin. For this run:
 
