@@ -33,7 +33,7 @@ metadata:
   labels:
     component: 63-elasticsearch
 spec:
-  replicas: 3
+  replicas: 1
   serviceName: monitored-cluster-headless  
   template:
     metadata: 
