@@ -3,17 +3,16 @@ kind: Deployment
 metadata:
   name: kibana
   labels:
-    run: kibana
-    name: kibana
+    app: kibana
 spec:
   replicas: 1
   selector:
     matchLabels:
-      run: kibana
+      app: kibana
   template:
     metadata:
       labels:
-        run: kibana
+        app: kibana
       annotations:
         co.elastic.metrics.kibana/module: kibana
         co.elastic.metrics.kibana/hosts: "${data.host}:5601"
@@ -24,7 +23,7 @@ spec:
           command:
             - sh
             - -c
-            - until nslookup monitored-cluster; do echo waiting for monitored-cluster; sleep 2; done;
+            - until wget -q elasticsearch:9200; do echo Waiting for elasticsearch; sleep 1; done
       containers:
       - name: kibana
         image: docker.elastic.co/kibana/kibana:7.0.0-alpha1-SNAPSHOT
@@ -35,7 +34,7 @@ spec:
             cpu: 100m
         env:
           - name: ELASTICSEARCH_URL
-            value: http://monitored-cluster:9200
+            value: http://elasticsearch:9200
         ports:
         - containerPort: 5601
           hostPort: 5601
@@ -53,5 +52,5 @@ spec:
     protocol: TCP
     targetPort: 5601
   selector:
-    run: kibana
+    app: kibana
   type: NodePort
