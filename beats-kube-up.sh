@@ -55,9 +55,7 @@ $BIN/kubectl create -f manifests/kube-state-metrics.yaml
 echo ""
 
 echo "elasticsearch ($ES_NODES nodes)..."
-cp manifests/elasticsearch.yaml manifests/elasticsearch-replicas.yaml
-sed -i "s/replicas: 1/replicas: $ES_NODES/g" manifests/elasticsearch-replicas.yaml
-sed -i "s/value: \"1\"/value: \"$ES_MIN_MASTER_NODES\"/g" manifests/elasticsearch-replicas.yaml
+sed -e "s/replicas: 1/replicas: $ES_NODES/g" -e "s/value: \"1\"/value: \"$ES_MIN_MASTER_NODES\"/g" manifests/elasticsearch.yaml > manifests/elasticsearch-replicas.yaml
 $BIN/kubectl create -f manifests/elasticsearch-replicas.yaml
 rm manifests/elasticsearch-replicas.yaml
 echo ""
