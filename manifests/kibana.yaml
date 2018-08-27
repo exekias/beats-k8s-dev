@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kibana
@@ -37,6 +37,7 @@ spec:
             value: http://elasticsearch:9200
         ports:
         - containerPort: 5601
+          hostPort: 5601
           name: ui
 ---
 apiVersion: v1
@@ -46,10 +47,11 @@ metadata:
   labels:
     service: kibana
 spec:
-  type: NodePort
-  selector:
-    app: kibana
   ports:
   - port: 5601
+    protocol: TCP
+    targetPort: 5601
     nodePort: 5601
-    name: ui
+  selector:
+    app: kibana
+  type: NodePort

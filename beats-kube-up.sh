@@ -5,6 +5,9 @@ K8S_VERSION="v1.10.0"
 MINIKUBE_VERSION="v0.28.2"
 MEMORY_MB="8192"
 BIN=./bin
+# 1 Elasticsearch node by default:
+ES_NODES=${ES_NODES:-1}
+ES_MIN_MASTER_NODES=$(expr $ES_NODES / 2 + 1)
 
 case $(uname -s) in
    Darwin) OS=darwin ;;
@@ -51,8 +54,10 @@ echo "kube-sate-metrics..."
 $BIN/kubectl create -f manifests/kube-state-metrics.yaml
 echo ""
 
-echo "elasticsearch..."
-$BIN/kubectl create -f manifests/elasticsearch.yaml
+echo "elasticsearch ($ES_NODES nodes)..."
+sed -e "s/replicas: 1/replicas: $ES_NODES/g" -e "s/value: \"1\"/value: \"$ES_MIN_MASTER_NODES\"/g" manifests/elasticsearch.yaml > manifests/elasticsearch-replicas.yaml
+$BIN/kubectl create -f manifests/elasticsearch-replicas.yaml
+rm manifests/elasticsearch-replicas.yaml
 echo ""
 
 echo "kibana..."

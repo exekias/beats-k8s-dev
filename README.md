@@ -17,6 +17,12 @@ Clone this repo and run the `beats-kube-up.sh` script:
 $ ./beats-kube-up.sh
 ```
 
+If you want to to use an Elasticsearch cluster of 3 nodes instead of just 1 use:
+
+```console
+$ ES_NODES=3 ./beats-kube-up.sh
+```
+
 Once done, services will start their deploy, you can check the status with the `kubectl` command:
 
 ```console
