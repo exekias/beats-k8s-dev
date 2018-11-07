@@ -43,6 +43,7 @@ data:
         - volume
         - event
       period: 10s
+      host: ${NODE_NAME}
       hosts: ["localhost:10255"]
 
     - module: kubernetes
@@ -53,6 +54,7 @@ data:
         - state_pod
         - state_container
       period: 10s
+      host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
 
     processors:
@@ -61,7 +63,7 @@ data:
     metricbeat.autodiscover:
       providers:
         - type: kubernetes
-          host: ${HOSTNAME}
+          host: ${NODE_NAME}
           hints.enabled: true
 
     setup.kibana.host: "kibana:5601"
@@ -109,6 +111,11 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         volumeMounts:
         - name: config
           mountPath: /etc/metricbeat.yml
@@ -162,15 +169,28 @@ metadata:
   labels:
     k8s-app: metricbeat
 rules:
-- apiGroups: [""] # "" indicates the core API group
+- apiGroups: [""]
   resources:
+  - nodes
   - namespaces
   - events
   - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources:
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets
+  - deployments
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
   verbs:
   - get
-  - watch
-  - list
 ---
 apiVersion: v1
 kind: ServiceAccount
